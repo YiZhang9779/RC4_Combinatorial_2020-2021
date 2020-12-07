@@ -7,8 +7,8 @@ public class BruteForceFiller : MonoBehaviour
 {
     private float _voxelSize = 0.2f;
     private int _voxelOffset = 2;
-    private int _triesPerIteration = 2500;
-    private int _iterations = 100;
+    private int _triesPerIteration = 25000;
+    private int _iterations = 10;
 
     private int _tryCounter = 0;
     private int _iterationCounter = 0;
@@ -23,6 +23,11 @@ public class BruteForceFiller : MonoBehaviour
     private BuildingManager _buildingManager;
     private VoxelGrid _grid;
 
+    private List<Voxel> _targetVoxels;
+    private List<Voxel> _xzVoxels;
+    private List<Voxel> _yzVoxels;
+    private List<Voxel> _otherVoxels;
+
     public BuildingManager BManager
     {
         get
@@ -36,6 +41,7 @@ public class BruteForceFiller : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// Generate a random index within the voxelgrid
     /// </summary>
@@ -46,6 +52,24 @@ public class BruteForceFiller : MonoBehaviour
         int y = Random.Range(0, _grid.GridSize.y);
         int z = Random.Range(0, _grid.GridSize.z);
         return new Vector3Int(x, y, z);
+    }
+
+    Vector3Int RandomVoxelXZ()
+    {
+        int i = Random.Range(0, _xzVoxels.Count);
+        return new Vector3Int(_xzVoxels[i].Index.x, _xzVoxels[i].Index.y, _xzVoxels[i].Index.z);
+    }
+
+    Vector3Int RandomVoxelYZ()
+    {
+        int i = Random.Range(0, _yzVoxels.Count);
+        return new Vector3Int(_yzVoxels[i].Index.x, _yzVoxels[i].Index.y, _yzVoxels[i].Index.z);
+    }
+
+    Vector3Int RandomVoxelOther()
+    {
+        int i = Random.Range(0, _otherVoxels.Count);
+        return new Vector3Int(_otherVoxels[i].Index.x, _otherVoxels[i].Index.y, _otherVoxels[i].Index.z);
     }
 
     /// <summary>
@@ -59,6 +83,22 @@ public class BruteForceFiller : MonoBehaviour
         int z = Random.Range(0, 4) * 90;
         return Quaternion.Euler(x, y, z);
     }
+    Quaternion RandomRotationXZ()
+    {
+        int x = Random.Range(0, 2) * 180;
+        int y = Random.Range(0, 4) * 90;
+        int z = Random.Range(0, 2) * 180;
+        return Quaternion.Euler(x, y, z);
+    }
+
+    Quaternion RandomRotationXY()
+    {
+        int x = Random.Range(0, 2) * 180;
+        int y = Random.Range(0, 2) * 180;
+        int z = Random.Range(0, 4) * 90;
+        return Quaternion.Euler(x, y, z);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -66,11 +106,51 @@ public class BruteForceFiller : MonoBehaviour
         Debug.Log(_grid.GridSize);
         _grid.DisableOutsideBoundingMesh();
         Random.seed = _seed;
+
+        //get all voxels in the boundingmesh-shaped grid
+        //_voxelList = (List<Voxel>)_grid.GetVoxels();
+        //a method to find all the voxels with empty neighbours in boundingmesh
+
+        //_targetVoxels = new List<Voxel>();
+        //foreach (var voxel in _grid.FlattenedVoxels)
+        //{
+        //    //if (HasEmptyNeighbourUpward(voxel)) voxel.Status = VoxelState.Dead;
+        //    if (HasEmptyNeighbourUpward(voxel))
+        //    {
+        //        _targetVoxels.Add(voxel);
+        //    }
+        //}
+
+        _xzVoxels = new List<Voxel>();
+        _yzVoxels = new List<Voxel>();
+        _otherVoxels = new List<Voxel>();
+
+
+        foreach (var voxel in _grid.FlattenedVoxels)
+        {
+            Voxel[] neighbours = voxel.GetNeighbours();
+            if (neighbours[0]==null || neighbours[0].Status == VoxelState.Dead || neighbours[1] == null || neighbours[1].Status == VoxelState.Dead)
+            {
+                _xzVoxels.Add(voxel);
+            }
+           
+            else if (neighbours[2] == null || neighbours[2].Status == VoxelState.Dead || neighbours[3] == null || neighbours[3].Status == VoxelState.Dead)
+            {
+                _yzVoxels.Add(voxel);
+            }
+
+            else
+            {
+                _otherVoxels.Add(voxel);
+            }
+
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+
         if (Input.GetKeyDown("space"))
         {
             //TryAddRandomBlock();
@@ -133,12 +213,28 @@ public class BruteForceFiller : MonoBehaviour
     /// Method to add a random block to the grid
     /// </summary>
     /// <returns>returns true if it managed to add the block to the grid</returns>
-    private bool TryAddRandomBlock()
+    private bool TryAddRandomBlockXZ()
     {
-        _grid.SetRandomType();
-        _grid.AddBlock(RandomIndex(), RandomRotation());
+        //_grid.SetRandomType();
+        _grid.SetTypeByRatio();
+        _grid.AddBlock(RandomVoxelXZ(), RandomRotationXZ());
+        //_grid.AddBlock(RandomVoxelYZ(), RandomRotationXY());
+        //_grid.AddBlock(RandomVoxelOther(), RandomRotation());
         bool blockAdded = _grid.TryAddCurrentBlocksToGrid();
-        Debug.Log("HEllo");
+        //Debug.Log("HEllo");
+        _grid.PurgeUnplacedBlocks();
+        return blockAdded;
+    }
+
+    private bool TryAddRandomBlockXY()
+    {
+        //_grid.SetRandomType();
+        _grid.SetTypeByRatio();
+        //_grid.AddBlock(RandomVoxelXZ(), RandomRotationXZ());
+        _grid.AddBlock(RandomVoxelYZ(), RandomRotationXY());
+        //_grid.AddBlock(RandomVoxelOther(), RandomRotation());
+        bool blockAdded = _grid.TryAddCurrentBlocksToGrid();
+        //Debug.Log("HEllo");
         _grid.PurgeUnplacedBlocks();
         return blockAdded;
     }
@@ -151,7 +247,7 @@ public class BruteForceFiller : MonoBehaviour
     {
         while (_tryCounter < _triesPerIteration)
         {
-            TryAddRandomBlock();
+            TryAddRandomBlockXZ();
             _tryCounter++;
             yield return new WaitForSeconds(0.01f);
         }
@@ -166,7 +262,8 @@ public class BruteForceFiller : MonoBehaviour
         _tryCounter = 0;
         while (_tryCounter < _triesPerIteration)
         {
-            TryAddRandomBlock();
+            TryAddRandomBlockXZ();
+            TryAddRandomBlockXY();
             _tryCounter++;
         }
 
@@ -198,5 +295,15 @@ public class BruteForceFiller : MonoBehaviour
             Debug.Log(value);
         }
     }
+
+
+    public bool HasEmptyNeighbourUpward(Voxel voxel)
+    {
+        Vector3Int upperVoxelIndex = voxel.Index + Vector3Int.up;
+        if (!Util.CheckBounds(upperVoxelIndex, _grid)) return true;
+        if (_grid.GetVoxelByIndex(upperVoxelIndex).Status == VoxelState.Dead) return true;
+        return false;
+    }
+
 
 }

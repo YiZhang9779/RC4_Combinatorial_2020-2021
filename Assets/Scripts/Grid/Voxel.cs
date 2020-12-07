@@ -102,5 +102,51 @@ public class Voxel
     {
         _goVoxel.GetComponent<MeshRenderer>().material.color = color;
     }
+
+    public Voxel[] GetNeighbours()
+    {
+        Voxel[] neighbours = new Voxel[6];
+        // Add check for indices out of bounds
+        // if index in grid, add voxel on index
+        if (Util.CheckBounds(Index + Vector3Int.up, _grid))
+        {
+            neighbours[0] = _grid.Voxels[Index.x, Index.y + 1, Index.z];
+        }
+        // if index not in grid, add null;
+        else
+        {
+            neighbours[0] = null;
+        }
+
+        if (Util.CheckBounds(Index + Vector3Int.down, _grid))
+        {
+            neighbours[1] = _grid.Voxels[Index.x, Index.y - 1, Index.z];
+        }
+        else
+        {
+            neighbours[1] = null;
+        }
+
+        if (Util.CheckBounds(Index + Vector3Int.left, _grid))
+        {
+            neighbours[2] = _grid.Voxels[Index.x - 1, Index.y, Index.z];
+        }
+        else
+        {
+            neighbours[2] = null;
+        }
+
+        if (Util.CheckBounds(Index + Vector3Int.right, _grid))
+        {
+            neighbours[3] = _grid.Voxels[Index.x + 1, Index.y, Index.z];
+        }
+        else
+        {
+            neighbours[3] = null;
+        }
+
+        //Get the neighours of this voxel
+        return neighbours;
+    }
     #endregion
 }

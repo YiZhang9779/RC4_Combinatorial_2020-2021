@@ -69,8 +69,10 @@ public class VoxelGrid
             if (_goPatternPrefabs == null)
             {
                 _goPatternPrefabs = new Dictionary<PatternType, GameObject>();
-                _goPatternPrefabs.Add(PatternType.PatternA, Resources.Load("Prefabs/PrefabPatternA") as GameObject);
-                _goPatternPrefabs.Add(PatternType.PatternB, Resources.Load("Prefabs/PrefabPatternB") as GameObject);
+                _goPatternPrefabs.Add(PatternType.PatternA, Resources.Load("Prefabs/PrefabPatternA1") as GameObject);
+                _goPatternPrefabs.Add(PatternType.PatternB, Resources.Load("Prefabs/PrefabPatternB1") as GameObject);
+                _goPatternPrefabs.Add(PatternType.PatternC, Resources.Load("Prefabs/PrefabPatternC1") as GameObject);
+
             }
             return _goPatternPrefabs;
         }
@@ -89,6 +91,8 @@ public class VoxelGrid
                         yield return Voxels[x, y, z];
         }
     }
+
+
 
     public Voxel GetVoxelByIndex(Vector3Int index) => Voxels[index.x, index.y, index.z];
     /// <summary>
@@ -300,6 +304,23 @@ public class VoxelGrid
     {
         PatternType[] values = System.Enum.GetValues(typeof(PatternType)).Cast<PatternType>().ToArray();
         _currentPattern = (PatternType)values[Random.Range(0, values.Length)];
+    }
+
+    public void SetTypeByRatio()
+    {
+        int r = Random.Range(0, 10);
+        if (r < 5)
+        {
+            _currentPattern = PatternType.PatternA;
+        }
+        else if (r < 8)
+        {
+            _currentPattern = PatternType.PatternB;
+        }
+        else
+        {
+            _currentPattern = PatternType.PatternC;
+        }
     }
     #endregion
 
