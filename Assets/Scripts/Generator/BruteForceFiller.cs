@@ -26,7 +26,7 @@ public class BruteForceFiller : MonoBehaviour
     private List<Voxel> _targetVoxels;
     private List<Voxel> _xzVoxels;
     private List<Voxel> _yzVoxels;
-    private List<Voxel> _otherVoxels;
+    private List<Voxel> _xyVoxels;
 
     public BuildingManager BManager
     {
@@ -68,8 +68,8 @@ public class BruteForceFiller : MonoBehaviour
 
     Vector3Int RandomVoxelOther()
     {
-        int i = Random.Range(0, _otherVoxels.Count);
-        return new Vector3Int(_otherVoxels[i].Index.x, _otherVoxels[i].Index.y, _otherVoxels[i].Index.z);
+        int i = Random.Range(0, _xyVoxels.Count);
+        return new Vector3Int(_xyVoxels[i].Index.x, _xyVoxels[i].Index.y, _xyVoxels[i].Index.z);
     }
 
     /// <summary>
@@ -123,28 +123,25 @@ public class BruteForceFiller : MonoBehaviour
 
         _xzVoxels = new List<Voxel>();
         _yzVoxels = new List<Voxel>();
-        _otherVoxels = new List<Voxel>();
+        _xyVoxels = new List<Voxel>();
 
-
+        //Move to a function in VoxelGrid
         foreach (var voxel in _grid.FlattenedVoxels)
         {
-            Voxel[] neighbours = voxel.GetNeighbours();
-            if (neighbours[0]==null || neighbours[0].Status == VoxelState.Dead || neighbours[1] == null || neighbours[1].Status == VoxelState.Dead)
-            {
-                _xzVoxels.Add(voxel);
-            }
-           
-            else if (neighbours[2] == null || neighbours[2].Status == VoxelState.Dead || neighbours[3] == null || neighbours[3].Status == VoxelState.Dead)
-            {
-                _yzVoxels.Add(voxel);
-            }
-
-            else
-            {
-                _otherVoxels.Add(voxel);
-            }
-
+            if (CheckIndices(new int[] { 0, 1 }, voxel)) _xzVoxels.Add(voxel);
+            else if (CheckIndices(new int[] { 2, 3 }, voxel)) _yzVoxels.Add(voxel);
+            else _xyVoxels.Add(voxel);
         }
+    }
+
+    bool CheckIndices(int[] indicesToCheck, Voxel voxel)
+    {
+        Voxel[] neighbours = voxel.GetNeighbours();
+        foreach (var index in indicesToCheck)
+        {
+            if (neighbours[index] == null || neighbours[index].Status == VoxelState.Dead) return true;
+        }
+        return false;
     }
 
     // Update is called once per frame
@@ -296,7 +293,7 @@ public class BruteForceFiller : MonoBehaviour
         }
     }
 
-
+    //If you need this, move it into the voxel class
     public bool HasEmptyNeighbourUpward(Voxel voxel)
     {
         Vector3Int upperVoxelIndex = voxel.Index + Vector3Int.up;
