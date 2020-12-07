@@ -50,13 +50,28 @@ public class PatternManager
                     new Vector3Int(0, 0, 0),
                     new Vector3Int(1, 0, 0),
                     new Vector3Int(2, 0, 0),
-                    new Vector3Int(2, 1, 0),
-                    new Vector3Int(3, 1, 0),
-                    new Vector3Int(4, 1, 0),
-                    new Vector3Int(5, 1, 0)
+                    new Vector3Int(3, 0, 0),
+                    new Vector3Int(-1, 0, 0),
+                    new Vector3Int(-2, 0, 0),
+                    new Vector3Int(-3, 0, 0)
                 },
                 PatternType.PatternB
                 );
+
+        ////Define pattern B
+        //AddPattern(
+        //    new List<Vector3Int>()
+        //        {
+        //            new Vector3Int(0, 0, 0),
+        //            new Vector3Int(1, 0, 0),
+        //            new Vector3Int(2, 0, 0),
+        //            new Vector3Int(2, 1, 0),
+        //            new Vector3Int(3, 1, 0),
+        //            new Vector3Int(4, 1, 0),
+        //            new Vector3Int(5, 1, 0)
+        //        },
+        //        PatternType.PatternB
+        //        );
 
         //Define pattern C
         AddPattern(

@@ -70,7 +70,7 @@ public class VoxelGrid
             {
                 _goPatternPrefabs = new Dictionary<PatternType, GameObject>();
                 _goPatternPrefabs.Add(PatternType.PatternA, Resources.Load("Prefabs/PrefabPatternA1") as GameObject);
-                _goPatternPrefabs.Add(PatternType.PatternB, Resources.Load("Prefabs/PrefabPatternB1") as GameObject);
+                _goPatternPrefabs.Add(PatternType.PatternB, Resources.Load("Prefabs/PrefabPatternB2") as GameObject);
                 _goPatternPrefabs.Add(PatternType.PatternC, Resources.Load("Prefabs/PrefabPatternC1") as GameObject);
 
             }
