@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class BruteForceFiller : MonoBehaviour
+public class BestFiller : MonoBehaviour
 {
     private float _voxelSize = 0.2f;
     private int _voxelOffset = 2;
     private int _triesPerIteration = 25000;
-    private int _iterations = 10;
+    private int _iterations = 1;
 
     private int _tryCounter = 0;
     private int _iterationCounter = 0;
@@ -38,19 +38,6 @@ public class BruteForceFiller : MonoBehaviour
             }
             return _buildingManager;
         }
-    }
-
-
-    /// <summary>
-    /// Generate a random index within the voxelgrid
-    /// </summary>
-    /// <returns>The index</returns>
-    Vector3Int RandomIndex()
-    {
-        int x = Random.Range(0, _grid.GridSize.x);
-        int y = Random.Range(0, _grid.GridSize.y);
-        int z = Random.Range(0, _grid.GridSize.z);
-        return new Vector3Int(x, y, z);
     }
 
     Vector3Int RandomVoxelXZ()
@@ -252,7 +239,7 @@ public class BruteForceFiller : MonoBehaviour
     /// <summary>
     /// Brute force random blocks in the available grid
     /// </summary>
-    private void BruteForceStep()
+    private IEnumerator BruteForceStep()
     {
         _grid.PurgeAllBlocks();
         _tryCounter = 0;
@@ -261,6 +248,8 @@ public class BruteForceFiller : MonoBehaviour
             TryAddRandomBlockXZ();
             TryAddRandomBlockXY();
             _tryCounter++;
+            yield return new WaitForSeconds(0.0000000000000001f);
+            //yield return
         }
 
         //Keep track of the most efficient seeds
@@ -281,7 +270,7 @@ public class BruteForceFiller : MonoBehaviour
         while (_iterationCounter < _iterations)
         {
             Random.seed = _seed++;
-            BruteForceStep();
+            StartCoroutine(BruteForceStep());
             _iterationCounter++;
             yield return new WaitForSeconds(0.05f);
         }
@@ -292,14 +281,7 @@ public class BruteForceFiller : MonoBehaviour
         }
     }
 
-    //If you need this, move it into the voxel class
-    public bool HasEmptyNeighbourUpward(Voxel voxel)
-    {
-        Vector3Int upperVoxelIndex = voxel.Index + Vector3Int.up;
-        if (!Util.CheckBounds(upperVoxelIndex, _grid)) return true;
-        if (_grid.GetVoxelByIndex(upperVoxelIndex).Status == VoxelState.Dead) return true;
-        return false;
-    }
 
 
 }
+

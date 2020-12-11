@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class BruteForceFiller : MonoBehaviour
+public class Filler : MonoBehaviour
 {
     private float _voxelSize = 0.2f;
     private int _voxelOffset = 2;
@@ -38,19 +38,6 @@ public class BruteForceFiller : MonoBehaviour
             }
             return _buildingManager;
         }
-    }
-
-
-    /// <summary>
-    /// Generate a random index within the voxelgrid
-    /// </summary>
-    /// <returns>The index</returns>
-    Vector3Int RandomIndex()
-    {
-        int x = Random.Range(0, _grid.GridSize.x);
-        int y = Random.Range(0, _grid.GridSize.y);
-        int z = Random.Range(0, _grid.GridSize.z);
-        return new Vector3Int(x, y, z);
     }
 
     Vector3Int RandomVoxelXZ()
@@ -300,6 +287,5 @@ public class BruteForceFiller : MonoBehaviour
         if (_grid.GetVoxelByIndex(upperVoxelIndex).Status == VoxelState.Dead) return true;
         return false;
     }
-
 
 }

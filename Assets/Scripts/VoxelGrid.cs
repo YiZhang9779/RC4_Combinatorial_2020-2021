@@ -298,7 +298,7 @@ public class VoxelGrid
     }
 
     /// <summary>
-    /// Set a random PatternType based on all the possible patterns in te PatternType Enum.
+    /// Set a random PatternType based on all the possible patterns in the PatternType Enum.
     /// </summary>
     public void SetRandomType()
     {
